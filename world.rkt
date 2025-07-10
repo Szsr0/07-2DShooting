@@ -9,17 +9,17 @@
 ;; プレイヤー（me）: (list x last-fired-tick)
 ;; enemy : 単一
 ;; missiles : リスト（複数）
-(struct world (me enemy missiles score level) #:transparent)
+(struct world (me enemies missiles score level) #:transparent)
 
 ;; 初期状態
 (define initial-world
-  (world initial-player initial-enemy '() 0 0))
+  (world initial-player initial-enemies '() 0 0))
 
 ;; 描画関数
 (define (world-draw w)
   (define bg (draw-missiles (world-missiles w)))
-  (define with-enemy (draw-enemy (world-enemy w) bg))
-  (define with-player (draw-player (world-me w) with-enemy))
+  (define with-enemies (draw-enemies (world-enemies w) bg))
+  (define with-player (draw-player (world-me w) with-enemies))
   (define with-score
     (place-image
      (text (string-append "Score: " (number->string (world-score w))) 16 "black")
@@ -30,30 +30,32 @@
 
 ;; 状態更新（on-tick）
 (define (world-next w)
-  (define old-enemy (world-enemy w))
+  (define old-enemies (world-enemies w))
   ;; level を取得
   (define lvl (world-level w))
   ;;　ミサイル移動が先
-  (define moved-missiles (next-missiles (world-missiles w) old-enemy lvl))
+  (define moved-missiles (next-missiles (world-missiles w) old-enemies lvl))
   ;; 移動後のミサイルで敵の更新
-  (define new-enemy (next-enemy old-enemy moved-missiles))
+  (define new-enemies (next-enemies old-enemies moved-missiles))
   (define new-me (update-player (world-me w)))
-  ;; 撃破判定
-  (define defeated? (and (not (string? old-enemy)) (string? new-enemy)))
-  ;; スコアは撃破ごとに100点
-  (define new-score (if defeated? (+ 100 (world-score w)) (world-score w)))
-  ;; レベルはスコアが500ごとに1Lv
-  (define new-level (quotient new-score 500))
-  
-  (world new-me new-enemy moved-missiles new-score new-level))
+   ;; 撃破された敵の数(old: normal → new: "none" になったもの)
+  (define defeated-count
+    (count (lambda (pair)
+             (and (not (string? (car pair))) (string? (cdr pair))))
+           (map cons old-enemies new-enemies)))
 
+  ;; スコア・レベル更新
+  (define new-score (+ (world-score w) (* 100 defeated-count)))
+  (define new-level (quotient new-score 500))
+
+  (world new-me new-enemies moved-missiles new-score new-level))
 
 (define (world-control w key)
   (define-values (new-me new-missiles)
     (control-player (world-me w) (world-missiles w) key))
 
   (world new-me
-         (world-enemy w)
+         (world-enemies w)
          new-missiles
          (world-score w)
          (world-level w)))

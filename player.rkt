@@ -37,9 +37,9 @@
     [(or (string=? key "right") (string=? key "d"))
      (values (list (min SCENE-WIDTH (+ me-x 5)) last-fire) missile-list)]
 
-    ;; スペースキー → 0.5秒（＝5tick）以上経っていれば発射
+    ;; スペースキー(一定時間以上経っていれば発射)
     [(string=? key " ")
-     (if (>= (- last-fire 5) 0)
+     (if (>= (- last-fire 10) 0)
          ;; 発射可能 → 新しいミサイル追加、時刻更新
          (values (list me-x 0)
                  (cons (list me-x (- SCENE-HEIGHT (image-height ME)))

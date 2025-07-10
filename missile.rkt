@@ -1,12 +1,12 @@
 #lang racket
 (require 2htdp/image
-         "enemys.rkt") ; 複数の敵に対応したファイルを読み込む
+         "enemy.rkt") ; 複数の敵に対応したファイルを読み込む
 
 (provide missile-x missile-y
          draw-missiles next-missiles move-missile
          hit? any-hit?)
 
-(define MISSILE (circle 10 "solid" "red"))
+(define MISSILE (circle 10 "solid" "cyan"))
 (define SCENE-WIDTH 400)
 (define SCENE-HEIGHT 600)
 (define ENEMY-SIZE 40) ; 敵サイズ（敵ファイルと整合性を保つため定義）
