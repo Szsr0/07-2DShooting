@@ -37,3 +37,22 @@
 (define (draw-enemy e scene)
   (cond [(string? e) scene]
         [else (place-image ENEMY (enemy-x e) (enemy-y e) scene)]))
+
+;; ------------------------------
+;; ▼ 以下:複数の敵に対応した追加コード ▼
+;; ------------------------------
+
+;; 初期の敵リスト(複数体)
+(define initial-enemies
+  (list
+   (enemy 100 100 3)
+   (enemy 200 120 -4)
+   (enemy 300 150 5)))
+
+;; 複数の敵の次の状態を計算
+(define (next-enemies enemies missiles)
+  (map (lambda (e) (next-enemy e missiles)) enemies))
+
+;; 複数の敵を描画
+(define (draw-enemies enemies scene)
+  (foldl (lambda (e s) (draw-enemy e s)) scene enemies))
