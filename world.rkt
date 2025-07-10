@@ -36,21 +36,37 @@
   ;; 移動後のミサイルで敵の更新
   (define new-enemies (next-enemies old-enemies moved-missiles))
   (define new-me (update-player (world-me w)))
-   ;; 撃破された敵の数(old: normal → new: "none" になったもの)
-  (define defeated-count
-    (count (lambda (pair)
-             (and (not (string? (car pair))) (string? (cdr pair))))
-           (map cons old-enemies new-enemies)))
-  ;; スコア・レベル更新
-  (define new-score (+ (world-score w) (* 100 defeated-count)))
+  ;; 撃破された敵のペアリスト(old -> new)
+  (define defeated-enemies
+    (filter (lambda (pair)
+              (and (not (string? (car pair))) (string? (cdr pair))))
+            (map cons old-enemies new-enemies)))
+
+  ;; 撃破スコア計算(ボスは多め)
+  (define defeated-score
+  (apply +
+         (map (lambda (pair)
+                (if (equal? (enemy-type (car pair)) "boss")
+                    1000
+                    100))
+              defeated-enemies)))
+  (define new-score (+ (world-score w) defeated-score))
   (define new-level (quotient new-score 500))
-
-  (world new-me new-enemies moved-missiles new-score new-level))
-
+  ;; 敵を補充
+  (define next-enemies-list
+  (if (andmap string? new-enemies) ; 全部 "none" なら全滅
+      (generate-enemies new-level) ; レベルに応じて敵を生成
+      new-enemies))
+  ;; 新しい世界状態
+  (world new-me next-enemies-list moved-missiles new-score new-level))
 
 (define (world-control w key)
+  (define lvl (world-level w))
+  ;; 発射間隔をレベルに応じて調整
+  (define fire-rate (max 1 (- 10 lvl)))
+
   (define-values (new-me new-missiles)
-    (control-player (world-me w) (world-missiles w) key))
+    (control-player (world-me w) (world-missiles w) key fire-rate))
 
   (world new-me
          (world-enemies w)

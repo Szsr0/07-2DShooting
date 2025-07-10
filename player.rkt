@@ -26,20 +26,20 @@
 ;; - missile-list: ミサイルのリスト
 ;; - key: 入力キー
 ;; - 現在の tick は `cadr me` が持ってる
-(define (control-player me missile-list key)
+(define (control-player me missile-list key fire-rate)
   (define me-x (car me))
   (define last-fire (cadr me))
 
     (cond
     [(or (string=? key "left") (string=? key "a"))
-     (values (list (max 0 (- me-x 5)) last-fire) missile-list)]
+     (values (list (max 0 (- me-x 10)) last-fire) missile-list)]
 
     [(or (string=? key "right") (string=? key "d"))
-     (values (list (min SCENE-WIDTH (+ me-x 5)) last-fire) missile-list)]
+     (values (list (min SCENE-WIDTH (+ me-x 10)) last-fire) missile-list)]
 
     ;; スペースキー(一定時間以上経っていれば発射)
     [(string=? key " ")
-     (if (>= (- last-fire 10) 0)
+     (if (>= (- last-fire fire-rate) 0)
          ;; 発射可能 → 新しいミサイル追加、時刻更新
          (values (list me-x 0)
                  (cons (list me-x (- SCENE-HEIGHT (image-height ME)))

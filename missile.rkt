@@ -21,7 +21,7 @@
 
 ;; 敵リストに対応した next-missiles----------
 (define (next-missiles missiles enemies level)
-  (define speed (+ 8 (* level 2)))
+  (define speed (+ 8 (* level 3)))
   (filter (lambda (m)
             (missile-alive? (move-missile m speed) enemies))
           (map (lambda (m) (move-missile m speed)) missiles)))
