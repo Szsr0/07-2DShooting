@@ -30,11 +30,11 @@
   (define me-x (car me))
   (define last-fire (cadr me))
 
-  (cond
-    [(string=? key "left")
+    (cond
+    [(or (string=? key "left") (string=? key "a"))
      (values (list (max 0 (- me-x 5)) last-fire) missile-list)]
 
-    [(string=? key "right")
+    [(or (string=? key "right") (string=? key "d"))
      (values (list (min SCENE-WIDTH (+ me-x 5)) last-fire) missile-list)]
 
     ;; スペースキー → 0.5秒（＝5tick）以上経っていれば発射
