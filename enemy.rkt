@@ -2,7 +2,8 @@
 (require 2htdp/image)
 
 (provide enemy-x enemy-y enemy-v
-         initial-enemy draw-enemy next-enemy)
+         initial-enemy draw-enemy next-enemy
+         ENEMY-SIZE hit?)
 
 (define SCENE-WIDTH 400)
 (define ENEMY-SIZE 40)
@@ -38,7 +39,3 @@
   (cond [(string? e) "none"]
         [(not (hit? m e)) (move-enemy e)]
         [else "none"]))
-
-(provide enemy-x enemy-y enemy-v
-         initial-enemy draw-enemy next-enemy
-         hit?)

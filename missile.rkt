@@ -12,17 +12,17 @@
 (define (missile-x m) (car m))
 (define (missile-y m) (cadr m))
 
-(define (move-missile m)
-  (list (missile-x m) (- (missile-y m) 8)))
+(define (move-missile m level)
+  (list (missile-x m) (- (missile-y m) (* 8 level))))
 
 (define (missile-alive? m e)
   (and (not (string? m)) (not (string? e))
        (>= (missile-y m) 0)
        (not (hit? m e))))
 
-(define (next-missile m e)
+(define (next-missile m e level)
   (cond [(string? m) "none"]
-        [(missile-alive? m e) (move-missile m)]
+        [(missile-alive? m e) (move-missile m level)]
         [else "none"]))
 
 (define (draw-missile m)
